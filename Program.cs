@@ -46,6 +46,7 @@ public class Student : IPerson
     }
     
     public override string ToString() => $"{LastName,-15} {Name,-15} {Patronomic,-15} {Date:MM-dd-yyyy} {Age,-3} {Course,-5} {Group,-10} {Score:F2}";
+    public string ToFileString() => ToString().Replace($"{Age,-3} ", "");
 
 }
 
@@ -84,6 +85,7 @@ public class Teacher : IPerson
         return new Teacher(values[0], values[1], values[2], DateTime.ParseExact(values[3], "MM-dd-yyyy", CultureInfo.InvariantCulture), values[4], float.Parse(values[5]), Post);
     }
     public override string ToString() => $"{LastName,-15} {Name,-15} {Patronomic,-15} {Date:MM-dd-yyyy} {Age,-3} {Department,-6} {Experience,-10:F4} {Post}";
+    public string ToFileString() => ToString().Replace($"{Age,-3} ", "");
 
 }
 
@@ -159,7 +161,8 @@ class Programm
         Console.WriteLine("5) Поиск по кафедре");
         Console.WriteLine("6) Вывести список студентов");
         Console.WriteLine("7) Вывести список преподавателей");
-        Console.WriteLine("8) Выход");
+        Console.WriteLine("8) Сохранить базу данных");
+        Console.WriteLine("9) Выход");
 
         int number = int.Parse(Console.ReadLine());
 
@@ -195,6 +198,10 @@ class Programm
                 PrintTeachers();
                 break;
             case 8:
+                SaveStudents();
+                SaveTeachers();
+                break;
+            case 9:
                 return;
             default: 
                 Console.WriteLine("Некорректные данные. Выберите цифру от 1 до 8");
@@ -295,5 +302,21 @@ class Programm
             }
         }
 
+        static void SaveStudents()
+        {
+            List<string> output = new List<string>();
+            foreach(var people in university.Students)
+                output.Add(people.ToFileString());
+            File.WriteAllLines("Students.txt", output);
+        }
+
+        static void SaveTeachers()
+        {
+            List<string> output = new List<string>();
+            foreach(var people in university.Teachers)
+                output.Add(people.ToFileString());
+            File.WriteAllLines("Teachers.txt", output);
+        }
     }
+
 }
