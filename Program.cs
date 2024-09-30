@@ -15,29 +15,9 @@ public interface IPerson
     DateTime Date { get; }
     int Age { get; }
 }
-public class Student : IPerson
-{
-    public string Name { get; }
-    public string Patronomic { get;}
-    public string LastName { get;}
-    public DateTime Date { get; }
-    public int Course { get;}
-    public int Group {get;}
-    public float Score {get;}
 
-    public Student (string lastname, string name, string patronomic, DateTime date, int course, int group, float score)
-    {
-        this.LastName = lastname;
-        this.Name = name;
-        this.Patronomic = patronomic;
-        this.Date = date;
-        this.Course = course;
-        this.Group = group;
-        this.Score = score;
-        if (Date > DateTime.Now)
-            throw new Exception("Человек еще не родился");
-    }
-    
+public record Student (string LastName, string Name, string Patronomic, DateTime Date, int Course, int Group, float Score) : IPerson
+{
     public int Age => (DateTime.Now.Year - Date.Year) - (DateTime.Now.DayOfYear < Date.DayOfYear ? 1 : 0);
     public static Student Parse(string s)
     {
@@ -47,46 +27,23 @@ public class Student : IPerson
     
     public override string ToString() => $"{LastName,-15} {Name,-15} {Patronomic,-15} {Date:MM-dd-yyyy} {Age,-3} {Course,-5} {Group,-10} {Score:F2}";
     public string ToFileString() => ToString().Replace($"{Age,-3} ", "");
-
 }
 
-
-public class Teacher : IPerson 
+public record Teacher (string LastName, string Name, string Patronomic, DateTime Date, string Department, float Experience, Teacher.Position Post) : IPerson
 {
-    public string LastName { get; }
-    public string Name { get; }
-    public string Patronomic { get; }
-    public DateTime Date { get; }
-    public string Department { get; }
-    public float Experience { get; }
     public enum Position 
     {
         Аспирант, Доцент, Профессор, Старший_Преподаватель
     }
-    public Position Post {get;}
-    public Teacher (string lastname, string name, string patronomic, DateTime date, string department, float experience, Position post)
-    {
-        this.LastName = lastname;
-        this.Name = name;
-        this.Patronomic = patronomic;
-        this.Date = date;
-        this. Department= department;
-        this.Experience = experience;
-        this.Post = post;
-        if (Date > DateTime.Now)
-            throw new Exception("Человек еще не родился");
-    }
     public int Age => (DateTime.Now.Year - Date.Year) - (DateTime.Now.DayOfYear < Date.DayOfYear ? 1 : 0);
-    
     public static Teacher Parse(string s)
     {
-        string[] values = s.Split(" ");
+        string[] values = s.Split(" ", StringSplitOptions.RemoveEmptyEntries);
         Enum.TryParse(Convert.ToString(values[6]), out Position Post);
         return new Teacher(values[0], values[1], values[2], DateTime.ParseExact(values[3], "MM-dd-yyyy", CultureInfo.InvariantCulture), values[4], float.Parse(values[5]), Post);
     }
     public override string ToString() => $"{LastName,-15} {Name,-15} {Patronomic,-15} {Date:MM-dd-yyyy} {Age,-3} {Department,-6} {Experience,-10:F4} {Post}";
     public string ToFileString() => ToString().Replace($"{Age,-3} ", "");
-
 }
 
 public interface IUniversity
